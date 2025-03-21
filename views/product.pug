@@ -1,0 +1,22 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="/styles/global.css")
+    title= product.name
+  body 
+    .product-container
+      .product-card
+        img.product-image(src=product.image alt=product.name)
+
+        .product-details
+          h1.product-title= product.name
+          p.product-description= product.description
+          p.product-price
+            sup $
+            | #{product.price}/-
+        
+          button.product-cart-btn Add To Cart
+
+        a.back-link(href="/") ← Back to Products

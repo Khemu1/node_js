@@ -8,7 +8,9 @@ export default class ProductController {
     this.productService = productService;
     // hen you pass a method as a callback (e.g., to an Express route), the method loses its original this context
     this.getAllProducts = this.getAllProducts.bind(this);
+    this.renderAllProducts = this.renderAllProducts.bind(this);
     this.getProductById = this.getProductById.bind(this);
+    this.renderProductById = this.renderProductById.bind(this);
     this.createProduct = this.createProduct.bind(this);
     this.patchProduct = this.patchProduct.bind(this);
     this.updateProduct = this.updateProduct.bind(this);
@@ -29,15 +31,42 @@ export default class ProductController {
     res.json(products);
   }
 
+  renderAllProducts(req: Request, res: Response) {
+    const queries: Queries = req.query;
+    const isEmptyQuery = Object.keys(queries).length === 0;
+
+    const products = isEmptyQuery
+      ? this.productService.getAllProducts()
+      : this.productService.getAllByQuery(queries);
+
+    res.render("index", {
+      title: "Product List",
+      products: products,
+    });
+  }
+
   getProductById(req: Request, res: Response) {
     const id = parseInt(req.params.id, 10);
     // don't send the req to service it won't work it only works with the controllers and middlewares
     const product = this.productService.getProductById(id);
     if (product) {
       res.json(product);
-    } else {
-      res.status(404).json({ message: "Product not found" });
+      return;
     }
+    res.status(404).json({ message: "Product not found" });
+  }
+  renderProductById(req: Request, res: Response) {
+    const id = parseInt(req.params.id, 10);
+    // don't send the req to service it won't work it only works with the controllers and middlewares
+    const product = this.productService.getProductById(id);
+    if (product) {
+      res.render("product", {
+        title: `Product: ${product.name}`,
+        product: product,
+      });
+      return;
+    }
+    res.status(400).render("404");
   }
 
   createProduct(req: Request, res: Response) {
